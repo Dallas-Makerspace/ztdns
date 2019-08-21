@@ -11,8 +11,10 @@ before_script:
 script:
   - export REPO=$DOCKER_USERNAME
   - export TAG=${TRAVIS_COMMIT}
-  - docker image build -t ${REPO}:${TAG} .
+  docker manifest create
+  - docker image build -t ${REPO}:linux-x86-64 .
+  - docker image build --build-arg GOARCH=arm -t ${REPO}:linux-armv7 .
 
 after_success:
-  - docker image tag ${REPO}:${TRAVIS_BRANCH:-"latest"} ${REPO}:latest
-  - docker push ${REPO}:latest
+  - docker manifest create ${REPO}:latest ${REPO}:linux-x86-64 ${REPO}:linux-armv7
+  - docker manifest push ${REPO}:latest
