@@ -1,18 +1,6 @@
-language: go
-
-go:
-  - master
-
 services:
   - docker
 
-before_install:
-  - go get -u github.com/uxbh/ztdns/
-  
-script:
-  - mkdir -p dist
-  - CGO_ENABLED="0" GOARCH="amd64" GOOS="linux" go build -a -installsuffix cgo -o ./dist/ztdns
-  
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - export REPO=$DOCKER_USER/ztdns
