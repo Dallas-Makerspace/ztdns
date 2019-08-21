@@ -9,8 +9,9 @@ before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 script:
-  - export REPO=$(echo $TRAVIS_REPO_SLUG | tr -d '-' | tr 'A-Z' 'a-z')
-  - docker image build -t ${REPO}:${TRAVIS_BRANCH:-"latest"} .
+  - export REPO=$(echo $TRAVIS_REPO_SLUG |  tr 'A-Z' 'a-z' | tr -d '-' )
+  - export TAG=${TRAVIS_COMMIT}
+  - docker image build -t ${REPO}:${TAG} .
 
 after_success:
   - docker image tag ${REPO}:${TRAVIS_BRANCH:-"latest"} ${REPO}:latest
