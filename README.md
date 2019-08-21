@@ -1,4 +1,4 @@
-# ZerotierDNS
+# ZerotierDNS [![Build Status](https://travis-ci.com/Dallas-Makerspace/ztdns.svg?branch=master)](https://travis-ci.com/Dallas-Makerspace/ztdns)
 
 ztDNS is a dedicated DNS server for a ZeroTier virtual network.
 
