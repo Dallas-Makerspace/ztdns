@@ -12,6 +12,7 @@ RUN go get -u github.com/uxbh/ztdns/ && \
 
 # Distribute
 FROM scratch
+LABEL MAINTAINER "vcc@dallasmakerspace.org"
 EXPOSE 53/udp
 ADD /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from:BUILDER /app/ztdns /ztdns
