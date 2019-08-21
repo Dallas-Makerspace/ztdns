@@ -1,10 +1,11 @@
 services:
   - docker
 
+env:
+  matrix:
+    - DOCKER_USERNAME=dallasmakerspace
+
 script:
-  - export REPO=$DOCKER_USERNAME/ztdns
-  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_TAG ; fi`
-  - echo $REPO:$TAG
-  - docker image build -t $REPO:$TAG .
+  - docker image build -t $(echo $TRAVIS_REPO_SLUG | tr -d '-'):${TRAVIS_BRANCH:-"latest"} .
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push $REPO
