@@ -5,7 +5,13 @@ env:
   matrix:
     - DOCKER_USERNAME=dallasmakerspace
 
-script:
-  - docker image build -t $(echo $TRAVIS_REPO_SLUG | tr -d '-'):${TRAVIS_BRANCH:-"latest"} .
+before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push $REPO
+
+script:
+  - export REPO=$(echo $TRAVIS_REPO_SLUG | tr -d '-')
+  - docker image build -t $REPO:${TRAVIS_BRANCH:-"latest"} .
+
+after_success:
+  - docker image tag $REPO:${TRAVIS_BRANCH} $REPO:latest
+  - docker push $REPO:latest
