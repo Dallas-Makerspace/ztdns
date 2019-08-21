@@ -1,8 +1,94 @@
-version: '3'
+---
+version: "3.7"
+
+x-influxlog: &syslog
+  logging:
+    driver: syslog
+    options:
+      #syslog-address: "udp://{{.Node.Hostname}}:6154"
+      #syslog-address: "udp://{{.Swarm.NodeAddr}}:6154"
+      syslog-address: "udp://127.0.0.1:6154"
+      syslog-format: rfc5424micro
+      tag: "{{.ImageName}}/{{.Name}}/{{.ID}}"
+
+x-replicas: &replicated
+  replicas: 1
+
+x-global: &global
+  mode: global
+
+x-worker: &worker
+  placement:
+    constraints: [node.role == worker]
+
+x-manager: &manager
+  placement:
+    constraints: [node.role == manager]
+
+x-restart: &on-failure
+  restart_policy:
+    condition: on-failure
+    max_attempts: 3
+    delay: 5s
+
+  rollback_config:
+    parallelism: 2
+    delay: 10s
+    monitor: 10s
+    order: start-first
+    failure_action: continue
+
+  update_config:
+    parallelism: 2
+    delay: 10s
+    monitor: 10s
+    order: start-first
+    failure_action: rollback
+
+x-stop-grace: &stopperiod
+  stop_grace_period: 30s
+
+x-orbiter-disable: &orbiter-off
+  orbiter: "false"
+  traefik.enabled: "false"
+
+x-orbiter-enable: &orbiter-on
+  orbiter: "true"
+  orbiter.up: "3"
+  orbiter.down: "1"
+
+x-default-healthcheck: &heathcheck-pass
+  test: ["CMD", "exit 0"]
+  interval: 25s
+  timeout: 5s
+  retries: 3
+
+configs:
+  ztdns.toml:
+    source: ./ztdns.toml
+    name: ztdns.toml-${RELEASE_NAME}
+
+networks:
+  default:
+    name: public
+    external: true
+    
 services:
   ztdns:
-    build: .
+    <<: *stopperiod
+    <<: *syslog
+    deploy:
+      <<: *global
+      <<: *manager
+      <<: *on-failure
+      <<: *orbiter-off
+      image: "dallasmakerspace/ztdns:latest"
     ports:
-     - "5356:53/udp"
-    volumes:
-     - .ztdns.toml:/app/.ztdns.toml
+       - "0.0.0.0:53:53/udp"
+    networks:
+       public:
+         aliases: dns
+    configs:
+       - ztdns.toml:/app/.ztdns.toml
+...
+# vim: set sts=2 sw=2 ts=2 et ai:
