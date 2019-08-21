@@ -10,8 +10,8 @@ before_script:
 
 script:
   - export REPO=$(echo $TRAVIS_REPO_SLUG | tr -d '-' | tr 'A-Z' 'a-z')
-  - docker image build -t $REPO:${TRAVIS_BRANCH:-"latest"} .
+  - docker image build -t ${REPO}:${TRAVIS_BRANCH:-"latest"} .
 
 after_success:
-  - docker image tag $REPO:${TRAVIS_BRANCH} $REPO:latest
-  - docker push $REPO:latest
+  - docker image tag ${REPO}:${TRAVIS_BRANCH:-"latest"} ${REPO}:latest
+  - docker push ${REPO}:latest
