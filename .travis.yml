@@ -1,0 +1,22 @@
+language: go
+
+go:
+  - master
+
+services:
+  - docker
+
+before_install:
+  - go get -u github.com/uxbh/ztdns/
+  
+script:
+  - mkdir -p dist
+  - CGO_ENABLED="0" GOARCH="amd64" GOOS="linux" go build -a -installsuffix cgo -o ./dist/ztdns
+  
+after_success:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - export REPO=$DOCKER_USER/ztdns
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_TAG ; fi`
+  - echo $REPO:$TAG
+  - docker image build -t $REPO:$TAG .
+  - docker push $REPO
