@@ -1,10 +1,10 @@
 services:
   - docker
 
-after_success:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+script:
   - export REPO=$DOCKER_USER/ztdns
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_TAG ; fi`
   - echo $REPO:$TAG
   - docker image build -t $REPO:$TAG .
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push $REPO
