@@ -14,6 +14,7 @@ script:
   docker manifest create
   - docker image build -t ${REPO}:linux-x86-64 .
   - docker image build --build-arg GOARCH=arm -t ${REPO}:linux-armv7 .
+  - docker image build --build-arg GOARCH=amd64 --build-arg GOOS=windows -t ${REPO}:windows-x86-64 .
 
 after_success:
   - docker manifest create ${REPO}:latest ${REPO}:linux-x86-64 ${REPO}:linux-armv7
